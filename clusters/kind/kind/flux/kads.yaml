@@ -40,7 +40,7 @@ spec:
           kadFiles:
             - clusters/context.yaml
             - clusters/kind/context.yaml
-            - clusters/kind/kad4/context.yaml
+            - clusters/kind/kind/context.yaml
             - clusters/kind/kind/deployments
             - components
             - templates.yaml
