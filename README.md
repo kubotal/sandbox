@@ -96,11 +96,11 @@ bound to the ingress entry.
 To define this range, enter the following in local `/etc/hosts` file:
 
 ```
-172.18.200.1 first.pool.kind.local ingress.kind.local podinfo.ingress.kind.local
+172.18.200.1 first.pool.kind.local ingress.kind.local skas.ingress.kind.local podinfo.ingress.kind.local
 172.18.200.4 last.pool.kind.local 
 ```
 
-`podinfo` is a sample application, which will be accessible through the ingress controller. As the `/etc/hosts` file 
+`podinfo` and `skas` are applications, which will be accessible through the ingress controller. As the `/etc/hosts` file 
 does not accept some wildcard (such as *.ingres.kind.local), each ingress entry must be explicitly bound to the VIP 
 
 Alternatively, if `dnsmasq` is configured on your system, you can configure the following:
@@ -166,10 +166,10 @@ export GITHUB_REPO=sandbox
 Some points to note here:
 
 - It is assumed the repo was copied into your **personal** GitHub account, under the name `sandbox`. 
-If not the case, the command above should be slightly modified. Refer to the FluxCD documentation.
+If not the case, the command above should be slightly modified, by replacing the option `--personal` with `--owner <your organization>`
 - The repository will be updated by the `flux` command. So, the provided token must allow such access.
 
-Then:
+Then, enter the following:
 
 ```
 flux bootstrap github \
@@ -181,19 +181,103 @@ flux bootstrap github \
 --path=clusters/kind/kind/flux
 ```
 
+You can have a look on the deployment by using `k9s`.  It will take several minutes. Be patient.
 
+> There is some stages in the deployment which involve a restart of the API server. This means the cluster will seem 
+frozen for serveral minutes. Again, be patient. 
 
+At the end, 
 
+```
+$ kubectl  get --all-namespaces pods
+NAMESPACE            NAME                                                     READY   STATUS    RESTARTS        AGE
+cert-manager         cert-manager-main-65f6d6d944-cjlwf                       1/1     Running   0               11m
+cert-manager         cert-manager-main-cainjector-7547dfc5d7-227wc            1/1     Running   0               11m
+cert-manager         cert-manager-main-webhook-7576667b65-qtnsh               1/1     Running   0               11m
+cert-manager         trust-manager-5968bdbbfd-vvvrg                           1/1     Running   3 (8m38s ago)   10m
+flux-system          helm-controller-58d5cc6f5b-c52g6                         1/1     Running   2 (8m28s ago)   24m
+flux-system          kad-controller-7b457d7cb-wrmhp                           1/1     Running   0               17m
+flux-system          kustomize-controller-d84b877fb-mqx6h                     1/1     Running   2 (8m34s ago)   24m
+flux-system          notification-controller-77fd94d6d4-ql4s2                 1/1     Running   2 (8m32s ago)   24m
+flux-system          source-controller-7657cffdb-84f5z                        1/1     Running   2 (8m33s ago)   24m
+ingress-nginx        ingress-nginx-main-controller-7f7f57897f-9fzkn           1/1     Running   0               10m
+kube-system          coredns-76f75df574-n2nwf                                 1/1     Running   0               26m
+kube-system          coredns-76f75df574-xvd4d                                 1/1     Running   0               26m
+kube-system          etcd-kind-control-plane                                  1/1     Running   0               26m
+kube-system          kindnet-27mrr                                            1/1     Running   2 (8m30s ago)   26m
+kube-system          kube-apiserver-kind-control-plane                        1/1     Running   0               8m28s
+kube-system          kube-controller-manager-kind-control-plane               1/1     Running   1 (8m55s ago)   26m
+kube-system          kube-proxy-76hn8                                         1/1     Running   0               26m
+kube-system          kube-scheduler-kind-control-plane                        1/1     Running   1 (8m56s ago)   26m
+kube-tools           reloader-main-reloader-55c66fc597-qbhkl                  1/1     Running   0               11m
+kube-tools           replicator-main-kubernetes-replicator-78b7858f66-nqstb   1/1     Running   0               11m
+kube-tools           secret-generator-6455b594b9-mfq9b                        1/1     Running   0               10m
+local-path-storage   local-path-provisioner-7577fdbbfb-fzsg9                  1/1     Running   0               26m
+metallb              metallb-main-controller-5bdfb944b6-59c2g                 1/1     Running   0               11m
+metallb              metallb-main-speaker-lwx9p                               4/4     Running   0               11m
+podinfo              podinfo-main-565c7584d5-kgdf4                            1/1     Running   0               9m21s
+skas-system          skas-main-6c95685d9d-ptbhb                               3/3     Running   0               9m21s```
+```
 
-
+You should new be able to connect to the sample application `podinfo` by pointing your favorite browser to 
+https://podinfo.ingress.kind.local/. Note, as we currently use only a self-signed certificate, you will have to go 
+through some security warning. See below to fix this.
 
 ## What is installed
 
-## Adding a Certificate Authority
+Here is a list of installed components:
+
+- [cert-manager](https://cert-manager.io/)
+- [ìngress-nginx](https://github.com/kubernetes/ingress-nginx)
+- [metallb](https://metallb.universe.tf/)
+- [reloader](https://github.com/stakater/Reloader)
+- [replicator](https://github.com/mittwald/kubernetes-replicator)
+- [secret-generator](https://github.com/mittwald/kubernetes-secret-generator)
+- [skas](https://www.skas.skasproject.com/)
+
+## SKAS (Kubernetes authentication)
+
+SKAS will allow you to act on your kubernetes cluster as an authenticated user and to restrict user's right using 
+standard RBAC permissions.
+
+To use SKAS, you will need to install locally a kubectl extension. 
+[Instruction here](https://www.skas.skasproject.com/installation/#installation-of-skas-cli) 
+
+Then, you should follow instruction for the [user guid](https://www.skas.skasproject.com/userguide/). 
+But, for the impatient, here is a quick process:
+
+First, you must configure your local `~/.kube/config` file:
+
+```
+kubectl sk init https://skas.ingress.kind.local --authInsecureSkipVerify=true
+```
+
+
+
+
+kubectl sk login admin
+kubectl sk user create larry --commonName "Larry SIMMONS " --email "larry@his-company.com" --password larry123
+kubectl sk user bind larry "system:masters"
+kubectl sk user bind larry "skas-admin"
+
+
+
+```
+
+```
+
+
 
 ## More about configuration
 
-## SKAS (Kubernetes authentication)
+TODO
+
+
+## Adding a Certificate Authority
+
+TODO
+
+
 
 # Roadmap
 
