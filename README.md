@@ -1,5 +1,24 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+## Index
 
-# Sandbox: Introduction
+- [Sandbox: Introduction](#sandbox-introduction)
+- [Prerequisite](#prerequisite)
+- [Deployment](#deployment)
+  - [cluster creation](#cluster-creation)
+  - [Setup our cluster repository](#setup-our-cluster-repository)
+  - [Configuration](#configuration)
+  - [Boostrap FluxCD](#boostrap-fluxcd)
+  - [What is installed](#what-is-installed)
+  - [SKAS (Kubernetes authentication)](#skas-kubernetes-authentication)
+  - [Adding a Certificate Authority](#adding-a-certificate-authority)
+  - [More about configuration](#more-about-configuration)
+- [Roadmap](#roadmap)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+
+# Introduction
 
 Aim of this sandbox is two demonstrate two principles
 
@@ -112,7 +131,7 @@ address=/last.pool.kind.local/172.18.200.4
 ```
 
 `address=/.ingress.kind.local/172.18.200.1` is the 'dnsmasq way' to configure wildcard name. So 
-`podinfo.ingress.kind.local` will resolve to `172.18.200.1`
+`podinfo.ingress.kind.local` and `skas.ingress.kind.local` will resolve to `172.18.200.1`
 
 These value must now be configured in the Git repository. Edit the file `/clusters/kind/kind/context.yaml`:
 
@@ -249,35 +268,83 @@ But, for the impatient, here is a quick process:
 First, you must configure your local `~/.kube/config` file:
 
 ```
-kubectl sk init https://skas.ingress.kind.local --authInsecureSkipVerify=true
+$ kubectl sk init https://skas.ingress.kind.local --authInsecureSkipVerify=true
 ```
 
+> If you encounter an error such as `The connection to the server 127.0.0.1:53220 was refused....`, the problem could
+be an incorrect value of `apiServer.portOnLocalhost` in the `/clusters/kind/kind/context.yaml` described before. 
+Set the correct value, commit the change and wait for the skas-main pod to restart automatically.
 
-
-
-kubectl sk login admin
-kubectl sk user create larry --commonName "Larry SIMMONS " --email "larry@his-company.com" --password larry123
-kubectl sk user bind larry "system:masters"
-kubectl sk user bind larry "skas-admin"
-
-
+Now, kubectl access to the cluster need an authentication. At this stage, the only account available is `admin` with password `admin`:
 
 ```
-
+$ kubectl get nodes
+Login:admin
+Password:
+Error from server (Forbidden): nodes is forbidden: User "admin" cannot list resource "nodes" in API group "" at the cluster scope
 ```
 
+The error is fine: We are correctly identified as user 'admin', but this user does not have any rights on the cluster. 
+It is only able to manage SKAS users. So, we can bind this user to an existing group, with full rights on the cluster:
 
+```
+kubectl sk user bind admin "system:masters"
+```
 
-## More about configuration
+After logout/login, we can now act as system admin: 
 
-TODO
+```
+$ kubectl sk logout
+Bye!
 
+$ kubectl get nodes
+Login:admin
+Password:
+NAME                 STATUS   ROLES           AGE   VERSION
+kind-control-plane   Ready    control-plane   96m   v1.29.2
+```
+
+At this stage, it is better to change the `admin` password:
+
+```
+$ kubectl sk password
+Will change password for user 'admin'
+Old password:
+New password:
+Confirm new password:
+Password has been changed sucessfully.
+```
+
+As `admin` is member of the group `skas-admin', it will be able to create users and grant them some rights:
+
+```
+$ kubectl sk user create larry --commonName "Larry SIMMONS " --email "larry@his-company.com" --password larry123
+User 'larry' created in namespace 'skas-system'.
+
+$ kubectl sk user bind larry "system:masters"
+GroupBinding 'larry.system.masters' created in namespace 'skas-system'.
+
+$ kubectl sk user bind larry "skas-admin"
+GroupBinding 'larry.skas-admin' created in namespace 'skas-system'.
+
+$ kubectl sk login larry
+Password:
+logged successfully..
+
+$ kubectl get nodes
+NAME                 STATUS   ROLES           AGE    VERSION
+kind-control-plane   Ready    control-plane   104m   v1.29.2
+```
+
+Please, refer to the [SKAS documentation](https://www.skas.skasproject.com/) for more features
 
 ## Adding a Certificate Authority
 
 TODO
 
+## More about configuration
 
+TODO
 
 # Roadmap
 
