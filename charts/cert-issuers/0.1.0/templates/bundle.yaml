@@ -6,7 +6,7 @@ metadata:
   name: {{ .Values.bundle.name }}  # The bundle name will also be used for the target
 spec:
   sources:
-    - useDefaultCAs: true
+    - useDefaultCAs: false
     # A Secret in the "trust" namespace; see "Trust Namespace" below for further details
 {{- range .Values.caClusterIssuers }}
     - secret:
@@ -21,6 +21,11 @@ spec:
   target:
     configMap:
       key: "root-certs.pem"
+    additionalFormats:
+      jks:
+        key: "bundle.jks"
+      pkcs12:
+        key: "bundle.p12"
     namespaceSelector:
 {{- toYaml .Values.bundle.namespaceSelector | nindent 6 }}
 {{- end }}
