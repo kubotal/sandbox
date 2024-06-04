@@ -5,6 +5,7 @@ sources:
     template: ociRepository
     config:
       url: oci://quay.io/sergealexandre/spark-history-server/chart/spark-history-server
+      version: 1.0.0
 
 
 components:

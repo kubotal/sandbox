@@ -118,6 +118,7 @@ templates:
       url: # TBD
     #     secretRef:
     #       name: pull-github
+      version: # TBD
     body: |
       ---
       apiVersion: source.toolkit.fluxcd.io/v1beta2
@@ -127,12 +128,16 @@ templates:
         namespace: {{ .Meta.source.namespace }}
       spec:
         interval: {{ .Config.interval }}   
+        layerSelector:
+          mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
+          operation: copy      
         url: {{ .Config.url }}
         {{- with .Config.secretRef }}
         secretRef:
           name: {{ .name }}
         {{- end }}
-      
+        ref:
+          semver: "= {{ .Config.version }}"
       
       
       
