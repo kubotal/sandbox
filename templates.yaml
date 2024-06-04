@@ -103,6 +103,30 @@ templates:
         secretRef:
           name: {{ .name }}
         {{- end }}
+
+
+  - name: ociRepository
+    config:
+      interval: "1m"  # TODO: Set to 24h after setup
+      url: # TBD
+    #     secretRef:
+    #       name: pull-github
+    body: |
+      ---
+      apiVersion: source.toolkit.fluxcd.io/v1beta2
+      kind: {{ .Meta.source.kind }}
+      metadata:
+        name: {{ .Meta.source.name }}
+        namespace: {{ .Meta.source.namespace }}
+      spec:
+        interval: {{ .Config.interval }}   
+        url: {{ .Config.url }}
+        {{- with .Config.secretRef }}
+        secretRef:
+          name: {{ .name }}
+        {{- end }}
+      
+      
       
       
       

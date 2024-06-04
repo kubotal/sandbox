@@ -1,5 +1,122 @@
 
+sources:
+  - name: spark-history-server
+    kind: OCIRepository
+    template: ociRepository
+    config:
+      url: oci://quay.io/sergealexandre/spark-history-server/chart/spark-history-server
+
+
 components:
+
+  - name: spark-history-server
+    createNamespace: true
+    vars:
+      ingressInfix: # TBD. Used also as OIDC client id, which is used in secret name
+      eventLogDir:  # TBD typically s3a://<bucket>/eventLogs
+      s3access:
+        url: # TBD
+        accessKey:
+          secretName: # TBD
+          keyProperty: accessKey
+          secretProperty: secretKey
+      oidc:
+        cipherSecretKey: FC5E81345CED0E256DC42E410362FF6E
+      adminGroups:     # Comma separated list
+      dex:
+        connector: skas
+    modules:
+      - name: main
+        source: spark-history-server
+        chart:
+          name: spark-history-server
+          version: 1.0.0
+        values: |
+          ingress:
+            enabled: true
+            ingressClassName: "nginx"
+            annotations:
+              nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+              cert-manager.io/cluster-issuer: {{ .Context.certificateIssuer.public }}
+            hosts:
+              - host: shs.{{ .Vars.ingressInfix }}.{{ .Context.ingress.url }}
+                paths:
+                  - path: /
+                    pathType: Prefix
+            tls:
+              - hosts:
+                  - shs.{{ .Vars.ingressInfix }}.{{ .Context.ingress.url }}
+                secretName: shs-space1-tls
+          config:
+            spark.hadoop.fs.s3a.endpoint: {{ .Vars.s3access.url }}
+            spark.hadoop.fs.s3a.connection.ssl.enabled: true
+            spark.history.fs.logDirectory: {{ .Vars.eventLogDir }}
+            spark.hadoop.fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
+            spark.hadoop.fs.s3a.path.style.access: true
+            spark.ui.filters: io.okdp.spark.authc.OidcAuthFilter
+            spark.user.groups.mapping: io.okdp.spark.authz.OidcGroupMappingServiceProvider
+            spark.history.ui.acls.enable: true
+            spark.io.okdp.spark.authc.OidcAuthFilter.param.issuer-uri: https://dex.shs.{{ .Vars.ingressInfix }}.{{ .Context.ingress.url }}/dex
+            spark.io.okdp.spark.authc.OidcAuthFilter.param.redirect-uri: https://shs.{{ .Vars.ingressInfix }}.{{ .Context.ingress.url }}/home
+            spark.io.okdp.spark.authc.OidcAuthFilter.param.scope: openid+profile+email+offline_access+groups
+            spark.io.okdp.spark.authc.OidcAuthFilter.param.cookie-max-age-minutes: 480
+            spark.io.okdp.spark.authc.OidcAuthFilter.param.cookie-cipher-secret-key: {{ .Vars.oidc.cipherSecretKey }}
+            spark.io.okdp.spark.authc.OidcAuthFilter.param.cookie-is-secure: true
+            spark.io.okdp.spark.authc.OidcAuthFilter.param.user-id: email # Or sub
+            # Members of this group will have access to all jobs.
+            spark.history.ui.admin.acls.groups: {{ .Vars.adminGroups }}
+          extraEnvs:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  key: {{ .Vars.s3access.keyProperty }}
+                  name: {{ .Vars.s3access.secretName }}
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: {{ .Vars.s3access.secretProperty }}
+                  name: {{ .Vars.s3access.secretName }}
+            # Disable Certificate Checking
+            - name: SPARK_HISTORY_OPTS
+              value: "-Dcom.amazonaws.sdk.disableCertChecking=true"
+            - name: JAVA_TOOL_OPTIONS
+              value: "-Djavax.net.ssl.trustStore=/cacerts/bundle.p12 -Djavax.net.ssl.trustStorePassword="
+            - name: AUTH_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  key: clientId
+                  name: shs-{{ .Vars.ingressInfix }}-client-secret
+            - name: AUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: clientSecret
+                  name: shs-{{ .Vars.ingressInfix }}-client-secret
+          extraVolumes:
+            - name: cacerts
+              configMap:
+                name: root-certs.pem
+          extraVolumeMounts:
+            - name: cacerts
+              mountPath: /cacerts
+      - name: dex
+        source: flux-system
+        chart:
+          path: ./charts/dex/2.36.0
+        values: |
+          nameOverride: {{ .Meta.deployment.name }}-dex
+          logger:
+            level: debug
+          ingress:
+            host: dex.shs.{{ .Vars.ingressInfix }}.{{ .Context.ingress.url }}
+            clusterIssuer: {{ .Context.certificateIssuer.public  }}
+          firstStaticClient:
+            name: "SparkHistoryServer"
+            id: "shs-{{  .Vars.ingressInfix  }}"
+            redirectURIs:
+              - https://shs.{{ .Vars.ingressInfix }}.{{ .Context.ingress.url }}/home
+          connectors:
+            {{- toYaml (get .Context.dex.connectors .Vars.dex.connector)  | nindent 12 }}
+        
 
   - name: secrets
     createNamespace: true
@@ -94,3 +211,4 @@ components:
           path: ./charts/kdp-workspace/0.1.0
         values: |
           namespace: {{ .Vars.namespace }}
+

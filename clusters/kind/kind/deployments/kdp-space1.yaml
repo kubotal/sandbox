@@ -28,6 +28,22 @@ deployments:
       - deployment: cnpg
         module: main
 
+  - name: space1-spark-history-server
+    enabled: true
+    component: spark-history-server
+    namespace: space1-sys
+    vars:
+      ingressInfix: space1
+      eventLogDir:  s3a://space1/eventLogs
+      s3access:
+        url: https://minio.minio1.svc:9000
+        accessKey:
+          secretName: minio
+          keyProperty: accessKey
+          secretProperty: secretKey
+        adminGroups: space-admin     # Comma separated list
+
+
   - name: space1-workspace
     enabled: true
     namespace: space1-sys
