@@ -30,7 +30,7 @@ spec:
         namespace: flux-system
       reconcileStrategy: Revision
       chart: kad-controller
-      version: "0.2.0-a1"
+      version: "0.2.0-a2"
       interval: 1m
   values:
     config:
