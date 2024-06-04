@@ -28,6 +28,12 @@ templates:
         releaseName: {{ .Meta.module.helmReleaseName  }}
         timeout: {{ .Config.timeout }}
         persistentClient: {{ .Config.persistentClient }}
+        {{- if eq .Meta.source.kind  "OCIRepository" }}
+          chartRef:
+            kind: OCIRepository
+            name: {{ .Meta.source.name }}
+            namespace: {{ .Meta.source.namespace }}
+        {{- else }}
         chart:
           spec:
             reconcileStrategy: {{ .Config.chart.reconcileStrategy }}
@@ -40,6 +46,7 @@ templates:
             version: {{ . }}
             {{- end }}
             interval: {{ .Config.chart.interval }}
+        {{- end }}
         install:
           createNamespace: {{ .Meta.deployment.createNamespace }}
           remediation:
