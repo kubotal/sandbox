@@ -91,7 +91,7 @@ templates:
 #       name: pull-github
     body: |
       ---
-      apiVersion: source.toolkit.fluxcd.io/v2
+      apiVersion: source.toolkit.fluxcd.io/v1
       kind: {{ .Meta.source.kind }}
       metadata:
         name: {{ .Meta.source.name }}
