@@ -35,7 +35,7 @@ deployments:
     vars:
       ingressInfix: space1
       eventLogDir:  s3a://space1/eventLogs
-      s3access:
+      s3:
         url: https://minio.minio1.svc:9000
         accessKey:
           secretName: minio

@@ -15,7 +15,7 @@ components:
     vars:
       ingressInfix: # TBD. Used also as OIDC client id, which is used in secret name
       eventLogDir:  # TBD typically s3a://<bucket>/eventLogs
-      s3access:
+      s3:
         url: # TBD
         accessKey:
           secretName: # TBD
@@ -49,7 +49,7 @@ components:
                   - shs.{{ .Vars.ingressInfix }}.{{ .Context.ingress.url }}
                 secretName: shs-space1-tls
           config:
-            spark.hadoop.fs.s3a.endpoint: {{ .Vars.s3access.url }}
+            spark.hadoop.fs.s3a.endpoint: {{ .Vars.s3.url }}
             spark.hadoop.fs.s3a.connection.ssl.enabled: true
             spark.history.fs.logDirectory: {{ .Vars.eventLogDir }}
             spark.hadoop.fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
@@ -70,13 +70,13 @@ components:
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  key: {{ .Vars.s3access.keyProperty }}
-                  name: {{ .Vars.s3access.secretName }}
+                  key: {{ .Vars.s3.accessKey.keyProperty }}
+                  name: {{ .Vars.s3.accessKey.secretName }}
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  key: {{ .Vars.s3access.secretProperty }}
-                  name: {{ .Vars.s3access.secretName }}
+                  key: {{ .Vars.s3.accessKey.secretProperty }}
+                  name: {{ .Vars.s3.accessKey.secretName }}
             # Disable Certificate Checking
             - name: SPARK_HISTORY_OPTS
               value: "-Dcom.amazonaws.sdk.disableCertChecking=true"
