@@ -25,6 +25,7 @@ components:
     createNamespace: true
     vars:
       namespace: # TBD
+      createLongLivedToken: false
     modules:
       - name: main
         source: flux-system
@@ -32,4 +33,5 @@ components:
           path: ./charts/kdp-workspace/0.1.0
         values: |
           namespace: {{ .Vars.namespace }}
+          createLongLivedToken: {{ .Vars.createLongLivedToken }}
 

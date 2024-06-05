@@ -50,6 +50,7 @@ deployments:
     component: workspace
     vars:
       namespace: space1
+      createLongLivedToken: true
 
   - name: space1-secrets
     component: secrets

@@ -4,6 +4,7 @@ namespace: # TBD
 serviceAccount:
   name: default
   create: false
+  createLongLivedToken: false
 
 role:
   name: spark
