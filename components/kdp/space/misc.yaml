@@ -1,0 +1,35 @@
+
+components:
+
+  # This component implies secrets in clear text in Git. So, its only a temporary solution, waiting for a
+  # more appropriate secret management solution.
+  - name: secrets
+    createNamespace: true
+    vars:
+      secrets: []
+      #  - name:
+      #    data:
+      #      - key:
+      #        value:
+    modules:
+      - name: main
+        source: flux-system
+        chart:
+          path: ./charts/kdp-secrets/0.1.0
+        values: |
+          secrets:
+            {{- toYaml .Vars.secrets | nindent 10 }}
+
+
+  - name: workspace
+    createNamespace: true
+    vars:
+      namespace: # TBD
+    modules:
+      - name: main
+        source: flux-system
+        chart:
+          path: ./charts/kdp-workspace/0.1.0
+        values: |
+          namespace: {{ .Vars.namespace }}
+

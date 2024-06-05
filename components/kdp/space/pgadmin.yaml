@@ -1,0 +1,31 @@
+
+components:
+
+  - name: pgadmin
+    createNamespace: true
+    vars:
+      admin:
+        user: # TBD
+        password: # TBD
+      ingressInfix: # TBD
+    modules:
+      - name: main
+        source: flux-system
+        chart:
+          path: ./charts/pgadmin/0.1.0
+        values: |
+          {{- if dig "kyverno" "namespace" "" .Context }}
+          kyverno:
+            namespace: {{ .Context.kyverno.namespace }}
+          {{- end }}
+          storage:
+            enabled: true
+            class: {{ .Context.storageClass.workspace }}
+            size: 500M
+          ingress:
+            clusterIssuer: {{ .Context.certificateIssuer.public }}
+            host:  pgadmin.{{ .Vars.ingressInfix}}.{{ .Context.ingress.url }}
+          admin:
+            value:
+              email: {{ .Vars.admin.user }}
+              password: {{ .Vars.admin.password }}
