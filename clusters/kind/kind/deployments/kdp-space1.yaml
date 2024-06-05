@@ -78,4 +78,14 @@ deployments:
             - key: secretKey
               value: minio123
 
+  - name: space1-jupyterhub
+    component: jupyterhub
+    namespace: space1-jhub
+    vars:
+      ingressInfix: space1
+      adminGroups:
+        - space-admin
+      allowedGroups:
+        - space1-admin
+        - space2-admin
 

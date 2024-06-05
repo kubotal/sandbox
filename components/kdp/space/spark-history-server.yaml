@@ -48,7 +48,7 @@ components:
             tls:
               - hosts:
                   - shs.{{ .Vars.ingressInfix }}.{{ .Context.ingress.url }}
-                secretName: shs-space1-tls
+                secretName: shs-{{ .Vars.ingressInfix }}-tls
           config:
             spark.hadoop.fs.s3a.endpoint: {{ .Vars.s3.url }}
             spark.hadoop.fs.s3a.connection.ssl.enabled: true

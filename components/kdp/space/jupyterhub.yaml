@@ -1,0 +1,199 @@
+
+
+sources:
+  - name: jupyterhub
+    kind: HelmRepository
+    template: helmRepository
+    config:
+      url: https://hub.jupyter.org/helm-chart
+
+components:
+
+  - name: jupyterhub
+    createNamespace: true
+    vars:
+      ingressInfix: # TBD. Used also as OIDC client id, which is used in secret name
+      adminGroups: # TBD (As list)
+      allowedGroups: # TBD (As list)
+      image:
+        name: quay.io/jupyterhub/k8s-singleuser-sample
+        tag: "3.2.1"
+        pullPolicy: IfNotPresent
+      dex:
+        connector: skas
+      userStorageSize: 50m
+    modules:
+      - name: main
+        source: jupyterhub
+        chart:
+          name: jupyterhub
+          version: 3.3.7
+        values: |
+          ingress:
+            enabled: true
+            annotations:
+              cert-manager.io/cluster-issuer: {{ .Context.certificateIssuer.public }}
+            ingressClassName: nginx
+            hosts:
+              - jupyterhub.{{ .Vars.ingressInfix }}.{{ .Context.ingress.url }}
+            pathSuffix:
+            pathType: Prefix
+            tls:
+              - hosts:
+                  - jupyterhub.{{ .Vars.ingressInfix }}.{{ .Context.ingress.url }}
+                secretName: jupyterhub-{{ .Vars.ingressInfix }}-tls
+          proxy:
+            service:
+              type: ClusterIP   # Was LoadBalancer
+            chp:
+              containerSecurityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop:
+                    - "ALL"
+                runAsNonRoot: true
+                seccompProfile:
+                  type: RuntimeDefault
+          hub:
+            config:
+              GenericOAuthenticator:
+                oauth_callback_url: https://jupyterhub.{{ .Vars.ingressInfix }}.{{ .Context.ingress.url }}/hub/oauth_callback # TBD https://jupyter.instid.ingress.mycluster/hub/oauth_callback
+                authorize_url: https://dex.jupyterhub.{{ .Vars.ingressInfix }}.{{ .Context.ingress.url }}/dex/auth  # TBD https://dex.instid.ingress.mycluster/dex/auth
+                token_url: https://dex.jupyterhub.{{ .Vars.ingressInfix }}.{{ .Context.ingress.url }}/dex/token # TBD https://dex.instid.ingress.mycluster/dex/token
+                userdata_url: https://dex.jupyterhub.{{ .Vars.ingressInfix }}.{{ .Context.ingress.url }}/dex/userinfo  # TBD https://dex.instid.ingress.mycluster/dex/userinfo
+                validate_server_cert: true
+                admin_groups:
+                {{- toYaml .Vars.adminGroups | nindent 12 }}
+                allowed_groups:
+                {{- toYaml .Vars.allowedGroups | nindent 12 }}
+                scope:
+                  - openid
+                  - profile
+                  - email
+                  - groups
+                  - federated:id
+                username_key: name
+                http_request_kwargs:
+                  ca_certs: /usr/local/etc/jupyterhub/dexca/root-certs.pem
+              JupyterHub:
+                authenticator_class: generic-oauth
+            extraEnv:
+              JUPYTER_ENABLE_LAB: "1"
+              OAUTH_CLIENT_ID:
+                valueFrom:
+                  secretKeyRef:
+                    name: jupyterhub-{{ .Vars.ingressInfix }}-client-secret
+                    key: clientId
+              OAUTH_CLIENT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: jupyterhub-{{ .Vars.ingressInfix }}-client-secret
+                    key: clientSecret
+            extraVolumes:
+              - name: dex-ca
+                configMap:
+                  name: root-certs.pem
+            extraVolumeMounts:
+              - name: dex-ca
+                mountPath: /usr/local/etc/jupyterhub/dexca
+            containerSecurityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - "ALL"
+              runAsNonRoot: true
+              seccompProfile:
+                type: RuntimeDefault
+          singleuser:
+            storage:
+              type: dynamic
+              dynamic:
+                storageClass: {{ .Context.storageClass.workspace }}
+              capacity: {{ .Vars.userStorageSize }}
+            image:
+              name: {{ .Vars.image.name }}
+              tag: {{ .Vars.image.tag }}
+              pullPolicy: {{ .Vars.image.pullPolicy }}
+          #    extraPodConfig:
+          #      securityContext:
+          ##        allowPrivilegeEscalation: false
+          ##        readOnlyRootFilesystem: true
+          #        capabilities:
+          #          drop:
+          #            - "ALL"
+          #        runAsNonRoot: true
+          #        seccompProfile:
+          #          type: RuntimeDefault
+          prePuller:
+            containerSecurityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - "ALL"
+              runAsNonRoot: true
+              seccompProfile:
+                type: RuntimeDefault
+            hook:
+              containerSecurityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop:
+                    - "ALL"
+                runAsNonRoot: true
+                seccompProfile:
+                  type: RuntimeDefault
+            pause:
+              containerSecurityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop:
+                    - "ALL"
+                runAsNonRoot: true
+                seccompProfile:
+                  type: RuntimeDefault
+          scheduling:
+            userScheduler:
+              containerSecurityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop:
+                    - "ALL"
+                runAsNonRoot: true
+                seccompProfile:
+                  type: RuntimeDefault
+            userPlaceholder:
+              containerSecurityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop:
+                    - "ALL"
+                runAsNonRoot: true
+                seccompProfile:
+                  type: RuntimeDefault
+
+      - name: dex
+        source: flux-system
+        chart:
+          path: ./charts/dex/2.36.0
+        values: |
+          nameOverride: {{ .Meta.deployment.name }}-dex
+          logger:
+            level: debug
+          ingress:
+            host: dex.jupyterhub.{{ .Vars.ingressInfix }}.{{ .Context.ingress.url }}
+            clusterIssuer: {{ .Context.certificateIssuer.public  }}
+          firstStaticClient:
+            name: "JupyterHub"
+            id: "jupyterhub-{{  .Vars.ingressInfix  }}"
+            redirectURIs:
+              - https://jupyterhub.{{ .Vars.ingressInfix }}.{{ .Context.ingress.url }}/hub/oauth_callback
+          connectors:
+            {{- toYaml (get .Context.dex.connectors .Vars.dex.connector)  | nindent 12 }}
+
