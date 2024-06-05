@@ -89,4 +89,7 @@ deployments:
       allowedGroups:
         - space1-admin
         - space2-admin
+      image:
+        name: quay.io/okdp/jupyter/pyspark-notebook
+        tag: spark-3.5.1-python-3.11-java-17-scala-2.12
 
