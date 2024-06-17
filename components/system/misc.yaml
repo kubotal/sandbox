@@ -179,6 +179,9 @@ components:
 
   - name: ingress-nginx
     createNamespace: true
+    vars:
+      kubernetes:
+        host: # TBD. ingress for api server.
     modules:
       - name: main
         source: ingress-nginx
@@ -193,4 +196,13 @@ components:
                 metallb.universe.tf/allow-shared-ip: "ingress"
             extraArgs:
               enable-ssl-passthrough: true
-              
+      - name: ext
+        source: flux-system
+        chart:
+          path: ./charts/ingress-ext/0.1.0
+        values: |
+          kubernetes:
+            enabled: {{ .Context.ingress.kubernetes.enabled }}
+            host: kubernetes.{{ .Context.ingress.url }}
+        dependsOn:
+          - main

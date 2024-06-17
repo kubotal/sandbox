@@ -18,12 +18,20 @@ sudo brew services restart dnsmasq
 
 ```
 
+
 Ensure:
 
 ```
 $ kubectx
 kubernetes-admin@kspray7.mbp
 ```
+
+If not:
+
+```
+export KUBECONFIG=/Users/sa/dev/d3/git/ezcmbp64/iac/kspray7/build/config
+```
+
 
 ```
 export GITHUB_USER=SergeAlexandre

@@ -8,3 +8,6 @@ context:
 
   networkPoliciesSupport: false
 
+  ingress:
+    kubernetes:
+      enabled: false
