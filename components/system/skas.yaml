@@ -1,0 +1,88 @@
+
+sources:
+
+  - name: skas
+    kind: HelmRepository
+    template: helmRepository
+    config:
+      url: https://skasproject.github.io/skas-charts
+
+
+components:
+
+  - name: skas
+    createNamespace: true
+    vars:
+      ldap: # May be empty
+    modules:
+      - name: skusers
+        source: skas
+        chart:
+          name: skusers
+          version: 0.3.0
+        dependsOn:
+          - main
+        values: |
+          {{- toYaml .Context.skas.skusers | nindent 6 }}
+      - name: main
+        config:
+          timeout:  "5m"
+        source: skas
+        chart:
+          name: skas
+          version: 0.2.2-snapshot
+        values: |
+          clusterIssuer: {{ .Context.certificateIssuer.public }}
+          image:
+            tag: 0.2.2-snapshot
+            pullPolicy: Always
+          skMerge:
+            providers:
+              - name: crd
+              {{- if .Vars.ldap }}
+              - name: ldap
+              {{- end }}
+          skAuth:
+            exposure:
+              external:
+                ingress:
+                  host: skas.{{ .Context.ingress.url }}
+            kubeconfig:
+              context:
+                name: skas@{{ .Context.cluster.name }}
+              cluster:
+                {{- if .Context.apiServer }}
+                apiServerUrl: https://127.0.0.1:{{ .Context.apiServer.portOnLocalhost }}
+                {{- else }}
+                apiServerUrl: https://kubernetes.{{ .Context.ingress.url }}
+                {{- end }}
+            passwordStrength:
+              forbidCommon: false    # Test against lists of common password
+              minimumScore: 0       # From 0 (Accept anything) to 4
+          skHConf:
+            enabled: true
+            image:
+              tag: 0.2.2-snapshot
+              pullPolicy: Always
+          skPadl:
+            enabled: true
+            log:
+              mode: dev
+              level: trace
+            ldap:
+              bindPassword: mysecret
+            exposure:
+              ssl: true
+              loadBalancer:
+                enabled: true
+                {{ $padl := printf "padl.%s" .Context.cluster.domain }}
+                ip: {{ resolveDNS $padl }}
+                hosts:
+                  - {{ $padl }}
+          {{- if .Vars.ldap }}
+          skLdap:
+            enabled: true
+            ldap:
+              {{- toYaml (required (printf "Invalid skas.ldap value: %s" .Vars.ldap ) (get .Context.skas.ldap .Vars.ldap))  | nindent 12 }}
+          {{- end }}
+          
