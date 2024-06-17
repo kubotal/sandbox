@@ -16,7 +16,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: {{ .Values.kubernetes.service }}}
+            name: {{ .Values.kubernetes.service }}
             port:
               number: {{ .Values.kubernetes.port }}
   ingressClassName: nginx
