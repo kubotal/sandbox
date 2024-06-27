@@ -1,0 +1,48 @@
+
+sources:
+  - name: topoprep
+    kind: OCIRepository
+    template: ociRepository
+    config:
+      url: pull quay.io/kubotal/charts/topoprep
+      version: 0.1.0-snapshot
+
+  - name: vgop
+    kind: OCIRepository
+    template: ociRepository
+    config:
+      url: pull quay.io/kubotal/charts/vgop
+      version: 0.1.0-snapshot
+
+  - name: topolvm
+    kind: HelmRepository
+    template: helmRepository
+    config:
+      url: https://topolvm.github.io/topolvm
+
+
+components:
+
+  - name: topolvm
+    vars:
+      onControlPlane: false
+    modules:
+      - name: vgop
+        source: vgop
+        values: |
+          {{- if .Vars.onControlPlane }}
+          tolerations:
+            - key: node-role.kubernetes.io/control-plane
+              operator: Exists
+              effect: NoSchedule
+            - key: node-role.kubernetes.io/master
+              operator: Exists
+              effect: NoSchedule
+          {{ end }}
+
+      - name: topoprep
+        source: topoprep
+        dependsOn:
+          - vgop
+
+

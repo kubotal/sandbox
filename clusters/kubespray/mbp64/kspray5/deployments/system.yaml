@@ -43,22 +43,8 @@ deployments:
       - deployment: ingress-nginx
         module: main
 
-
-  - name: openldap
-    enabled: false    # Need topolvm
-    component: openldap
-    namespace: openldap
-    vars:
-      replicaCount: 1
-      ldapDomain:  "odp.com"
-      adminUser: admin
-      adminPassword: admin123
-      configUser: "admin"
-      configPassword: admin123
-
-
-  - name: topolvm
-    enabled: true
-    component: topolvm
-    namespace: topolvm-system
+#  - name: topolvm
+#    enabled: true
+#    component: topolvm
+#    namespace: topolvm-system
 

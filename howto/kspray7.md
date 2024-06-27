@@ -51,14 +51,5 @@ flux bootstrap github \
 
 
 ```
-
-kubectl sk init https://skas.ingress.kspray7.mbp
-
-
-kubectl sk login admin admin
-kubectl sk user create sa --commonName "Serge ALEXANDRE" --email "sa@broadsoftware.com" --password as
-kubectl sk user bind sa "system:masters"
-kubectl sk user bind sa "skas-admin"
-kubectl sk logout
-
+kubectl sk init https://skas.ingress.kspray7.mbp --force
 ```

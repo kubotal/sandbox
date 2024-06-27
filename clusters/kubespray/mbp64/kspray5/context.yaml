@@ -1,0 +1,11 @@
+# Context for kspray5 cluster
+
+context:
+
+  cluster:
+    name: kspray5
+    domain: kspray5.mbp
+
+  ingress:
+    url: ingress.kspray5.mbp
+
