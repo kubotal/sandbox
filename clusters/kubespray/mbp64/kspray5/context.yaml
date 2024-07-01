@@ -35,11 +35,11 @@ context:
               - w3
             devicePaths:
               - /dev/sdd
-#      - name: myvg2
-#        selectors:
-#          - nodes:
-#              - w1
-#              - w2
-#              - w3
-#            devicePaths:
-#              - /dev/sde
+      - name: myvg2
+        selectors:
+          - nodes:
+              - w1
+              - w2
+              - w3
+            devicePaths:
+              - /dev/sde
