@@ -15,9 +15,9 @@ context:
     controller:
       replicaCount: 2
     storageClasses:
-      - name: allnodes
-        volumeGroupName: vg-allnodes
-        deviceClassName: dc-allnodes
+      - name: myvg1
+        volumeGroupName: vg-myvg1
+        deviceClassName: dc-myvg1
         spareGb: 2
         fsType: ext4
         reclaimPolicy: Delete
