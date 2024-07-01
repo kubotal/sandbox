@@ -56,7 +56,7 @@ context:
             devicePaths:
               - /dev/sde
       - name: onw3
-        deviceBindings:
+        selectors:
           - nodes:
               - w3
             devicePaths:
