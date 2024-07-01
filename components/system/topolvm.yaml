@@ -61,7 +61,7 @@ components:
             deviceClasses:
             {{- range .Context.topolvm.storageClasses }}
               - name: {{ default .name .deviceClassName }}
-                volumeGroup: {{ default .volumeGroup .name }}
+                volumeGroup: {{ default .name .volumeGroupName }}
                 default: false
                 spare-gb: {{ default 1 .spareGb }}
             {{ end }}
