@@ -43,3 +43,7 @@ context:
               - w3
             devicePaths:
               - /dev/sde
+
+  storageClass:
+    data: myvg1
+    workspace: myvg2
