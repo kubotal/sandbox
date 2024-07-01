@@ -43,7 +43,8 @@ components:
               selectors:
               {{ toYaml .selectors | nindent 6 }}
           {{- end }}          
-          
+          image:
+            pullPolicy: Always
       - name: topoprep
         source: topoprep
         dependsOn:
