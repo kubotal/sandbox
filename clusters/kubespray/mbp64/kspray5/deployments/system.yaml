@@ -38,7 +38,7 @@ deployments:
     component: skas
     namespace: skas-system
     vars:
-      ldap: # openldap
+      ldap: openldap
     dependsOn:
       - deployment: ingress-nginx
         module: main
@@ -47,7 +47,6 @@ deployments:
     enabled: true
     component: topolvm
     namespace: topolvm-system
-
 
   - name: openldap
     enabled: true

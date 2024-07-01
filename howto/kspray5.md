@@ -12,7 +12,7 @@ address=/w2.kspray5.mbp/192.168.56.52
 address=/w3.kspray5.mbp/192.168.56.53
 address=/.ingress.kspray5.mbp/192.168.56.54
 address=/padl.kspray5.mbp/192.168.56.55
-address=/.tcp2.kspray5.mbp/192.168.56.56
+address=/ldap.kspray5.mbp/192.168.56.56
 address=/.tcp3.kspray5.mbp/192.168.56.57
 address=/first.pool.kspray5.mbp/192.168.56.54
 address=/last.pool.kspray5.mbp/192.168.56.57
@@ -20,6 +20,7 @@ EOF
 
 sudo brew services restart dnsmasq
 
+sudo killall -HUP mDNSResponder
 
 ```
 

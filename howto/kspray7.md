@@ -16,6 +16,8 @@ EOF
 
 sudo brew services restart dnsmasq
 
+sudo killall -HUP mDNSResponder
+
 ```
 
 

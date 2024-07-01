@@ -9,3 +9,26 @@ context:
   ingress:
     url: ingress.kspray7.mbp
 
+  topolvm:
+    onControlPlane: false
+    controller:
+      replicaCount: 2
+    storageClasses:
+      - name: myvg1
+        isDefaultClass: true
+        selectors:
+          - nodes:
+              - n0
+            devicePaths:
+              - /dev/sdc
+              - /dev/sdd
+      - name: myvg2
+        selectors:
+          - nodes:
+              - n0
+            devicePaths:
+              - /dev/sde
+
+  storageClass:
+    data: myvg1
+    workspace: myvg2

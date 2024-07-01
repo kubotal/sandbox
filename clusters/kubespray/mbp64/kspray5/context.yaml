@@ -9,7 +9,6 @@ context:
   ingress:
     url: ingress.kspray5.mbp
 
-
   topolvm:
     onControlPlane: false
     controller:

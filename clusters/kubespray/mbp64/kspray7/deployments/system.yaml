@@ -38,27 +38,27 @@ deployments:
     component: skas
     namespace: skas-system
     vars:
-      ldap: # openldap
+      ldap: openldap
     dependsOn:
       - deployment: ingress-nginx
         module: main
 
+  - name: topolvm
+    enabled: true
+    component: topolvm
+    namespace: topolvm-system
 
   - name: openldap
-    enabled: false    # Need topolvm
+    enabled: true
     component: openldap
     namespace: openldap
     vars:
-      replicaCount: 1
+      replicaCount: 1 # Should be in context
       ldapDomain:  "odp.com"
       adminUser: admin
       adminPassword: admin123
       configUser: "admin"
       configPassword: admin123
-
-
-  - name: topolvm
-    enabled: false
-    component: topolvm
-    namespace: topolvm-system
-
+    dependsOn:
+      - deployment: topolvm
+        module: main
