@@ -4,14 +4,14 @@ sources:
     kind: OCIRepository
     template: ociRepository
     config:
-      url: pull quay.io/kubotal/charts/topoprep
+      url: oci://quay.io/kubotal/charts/topoprep
       version: 0.1.0-snapshot
 
   - name: vgop
     kind: OCIRepository
     template: ociRepository
     config:
-      url: pull quay.io/kubotal/charts/vgop
+      url: oci://quay.io/kubotal/charts/vgop
       version: 0.1.0-snapshot
 
   - name: topolvm
