@@ -24,13 +24,11 @@ sources:
 components:
 
   - name: topolvm
-    vars:
-      onControlPlane: false
     modules:
       - name: vgop
         source: vgop
         values: |
-          {{- if .Vars.onControlPlane }}
+          {{- if .Context.topolvm.onControlPlane }}
           tolerations:
             - key: node-role.kubernetes.io/control-plane
               operator: Exists
@@ -39,10 +37,60 @@ components:
               operator: Exists
               effect: NoSchedule
           {{ end }}
-
+          volumeGroups:
+          {{- range .Context.topolvm.storageClasses }}
+            - name: {{ default .name .volumeGroupName }}
+              selectors:
+              {{ toYaml .selectors | nindent 6 }}
+          {{- end }}          
+          
       - name: topoprep
         source: topoprep
         dependsOn:
           - vgop
+
+      - name: main
+        source: topolvm
+        chart:
+          name: topolvm
+          version: 15.0.0
+        values: |
+          controller:
+            replicaCount: {{ .Context.topolvm.controller.replicaCount }}
+          lvmd:
+            deviceClasses:
+            {{- range .Context.topolvm.storageClasses }}
+              - name: {{ default .name .deviceClassName }}
+                volumeGroup: {{ default .volumeGroup .name }}
+                default: false
+                spare-gb: {{ default 1 .spareGb }}
+            {{ end }}
+          storageClasses:
+          {{- range .Context.topolvm.storageClasses }}
+            - name: {{ .name }}
+              storageClass:
+                fsType: {{ default "xfs" .fsType }}
+                reclaimPolicy: {{ default "Delete" .reclaimPolicy }}
+                {{- with .annotations }}
+                annotations:
+                  {{- range $k, $v := . }}
+                  {{ $k }}: "{{$v}}"
+                  {{- end }}
+                {{- end }} 
+                isDefaultClass: {{ default "false" .isDefaultClass }}
+                volumeBindingMode: {{ default "WaitForFirstConsumer" .volumeBindingMode }}
+                allowVolumeExpansion: {{ default "true" .allowVolumeExpansion }}
+                {{- with .mountOptions }}
+                mountOptions:
+                  {{- range . }}
+                  - {{ . }}
+                  {{- end }}
+                {{- end }}
+                additionalParameters:
+                  "topolvm.io/device-class": "{{ default .name .deviceClassName }}"
+          {{- end }}
+        dependsOn:
+          - topoprep
+
 
 

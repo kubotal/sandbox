@@ -9,3 +9,55 @@ context:
   ingress:
     url: ingress.kspray5.mbp
 
+
+  topolvm:
+    onControlPlane: false
+    controller:
+      replicaCount: 2
+    storageClasses:
+      - name: allnodes
+        volumeGroupName: vg_allNodes
+        deviceClassName: dc_allNodes
+        spareGb: 2
+        fsType: ext4
+        reclaimPolicy: Delete
+#        annotations:
+#          test.kubotal.io: "true"
+#          test2.kubotal.io: true
+#          prometheus.io/path: /metrics
+#          prometheus.io/port: 1234
+        isDefaultClass: true
+        volumeBindingMode: WaitForFirstConsumer
+        allowVolumeExpansion: true
+#        mountOptions:
+#          - xx
+#          - yy
+        selectors:
+          - nodes:
+              - w1
+              - w2
+            devicePaths:
+              - /dev/sdc
+              - /dev/sdd
+          - nodes:
+              - w3
+            devicePaths:
+              - /dev/sdd
+      - name: onw1
+        selectors:
+          - nodes:
+              - w1
+            devicePaths:
+              - /dev/sde
+      - name: onw2
+        selectors:
+          - nodes:
+              - w2
+            devicePaths:
+              - /dev/sde
+      - name: onw3
+        deviceBindings:
+          - nodes:
+              - w3
+            devicePaths:
+              - /dev/sde

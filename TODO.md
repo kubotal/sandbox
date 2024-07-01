@@ -7,5 +7,5 @@
 - source.Kind seems redundant. Refactor object template
 
 kubespray:
-- Setup topelvm
+- Setup topolvm
 - Test network policy (hive-metastore)

@@ -58,7 +58,7 @@ deployments:
 
 
   - name: topolvm
-    enabled: true
+    enabled: false
     component: topolvm
     namespace: topolvm-system
 

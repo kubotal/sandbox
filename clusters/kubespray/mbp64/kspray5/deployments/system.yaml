@@ -43,8 +43,8 @@ deployments:
       - deployment: ingress-nginx
         module: main
 
-#  - name: topolvm
-#    enabled: true
-#    component: topolvm
-#    namespace: topolvm-system
+  - name: topolvm
+    enabled: true
+    component: topolvm
+    namespace: topolvm-system
 
