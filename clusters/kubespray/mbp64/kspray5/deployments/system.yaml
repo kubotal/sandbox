@@ -48,3 +48,18 @@ deployments:
     component: topolvm
     namespace: topolvm-system
 
+
+  - name: openldap
+    enabled: true
+    component: openldap
+    namespace: openldap
+    vars:
+      replicaCount: 2 # Should be in context
+      ldapDomain:  "odp.com"
+      adminUser: admin
+      adminPassword: admin123
+      configUser: "admin"
+      configPassword: admin123
+    dependsOn:
+      - deployment: topolvm
+        module: main
