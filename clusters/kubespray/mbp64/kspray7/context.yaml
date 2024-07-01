@@ -22,6 +22,7 @@ context:
             devicePaths:
               - /dev/sdc
               - /dev/sdd
+              - /dev/sdf
       - name: myvg2
         selectors:
           - nodes:

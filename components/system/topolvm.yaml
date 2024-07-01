@@ -45,6 +45,7 @@ components:
           {{- end }}          
           image:
             pullPolicy: Always
+
       - name: topoprep
         source: topoprep
         dependsOn:
