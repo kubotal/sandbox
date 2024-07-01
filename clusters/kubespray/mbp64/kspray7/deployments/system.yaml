@@ -62,3 +62,15 @@ deployments:
     dependsOn:
       - deployment: topolvm
         module: main
+
+  - name: minio1
+    parent: minio-small-4
+    namespace: minio1
+    vars:
+      ingressName: minio1
+    enabled: true
+    dependsOn:
+      - deployment: ingress-nginx
+        module: main
+      - deployment: topolvm
+        module: main

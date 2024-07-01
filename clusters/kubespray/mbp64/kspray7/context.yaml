@@ -10,9 +10,9 @@ context:
     url: ingress.kspray7.mbp
 
   topolvm:
-    onControlPlane: false
+    onControlPlane: true
     controller:
-      replicaCount: 2
+      replicaCount: 1
     storageClasses:
       - name: myvg1
         isDefaultClass: true
