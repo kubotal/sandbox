@@ -45,8 +45,8 @@ deployments:
     dependsOn:
       - deployment: ingress-nginx
         module: main
-      - deployment: openldap
-        module: main
+#      - deployment: openldap
+#        module: main
 
   - name: openldap
     enabled: false
