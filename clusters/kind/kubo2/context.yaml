@@ -13,4 +13,4 @@ context:
     url: ingress.kubo2.mbp
 
   openldap:
-    replicaCount: 1
+    replicaCount: 2
