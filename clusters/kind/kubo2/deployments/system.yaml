@@ -38,18 +38,18 @@ deployments:
     component: skas
     namespace: skas-system
     vars:
-      ldap:
+      ldap: openldap
       padl:
         enabled: true
         external: true
     dependsOn:
       - deployment: ingress-nginx
         module: main
-#      - deployment: openldap
-#        module: main
+      - deployment: openldap
+        module: main
 
   - name: openldap
-    enabled: false
+    enabled: true
     component: openldap
     namespace: openldap
     vars:
