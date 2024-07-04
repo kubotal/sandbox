@@ -19,7 +19,7 @@ components:
           path: ./charts/openldap/4.2.2/
         values: |
           openldap-stack-ha:
-            replicaCount: {{ .Vars.replicaCount }}
+            replicaCount: {{ default 2 .Context.openldap.replicaCount }}
             replication:
               enabled: {{ if ne .Vars.replicaCount 1 }}true{{else}}false{{end}}
             clusterIssuer: {{ .Context.certificateIssuer.public }}

@@ -21,7 +21,6 @@ deployments:
     component: openldap
     namespace: openldap
     vars:
-      replicaCount: 1
       ldapDomain:  "odp.com"
       adminUser: admin
       adminPassword: admin123

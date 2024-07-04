@@ -42,11 +42,8 @@ deployments:
     dependsOn:
       - deployment: ingress-nginx
         module: main
-
-  - name: topolvm
-    enabled: true
-    component: topolvm
-    namespace: topolvm-system
+      - deployment: openldap
+        module: main
 
   - name: openldap
     enabled: true
@@ -58,6 +55,14 @@ deployments:
       adminPassword: admin123
       configUser: "admin"
       configPassword: admin123
+
+
+  - name: minio1
+    parent: minio-small-1
+    namespace: minio1
+    vars:
+      ingressName: minio1
+    enabled: true
     dependsOn:
-      - deployment: topolvm
+      - deployment: ingress-nginx
         module: main

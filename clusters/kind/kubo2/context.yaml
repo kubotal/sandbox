@@ -1,0 +1,16 @@
+# Context specific to a kind cluster named 'kubo2'
+
+context:
+
+  cluster:
+    name: kubo2
+    domain: kubo2.mbp
+
+  apiServer:
+    portOnLocalhost: 5443
+
+  ingress:
+    url: ingress.kubo2.mbp
+
+  openldap:
+    replicaCount: 1

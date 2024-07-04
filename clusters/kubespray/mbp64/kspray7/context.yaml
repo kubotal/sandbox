@@ -9,6 +9,9 @@ context:
   ingress:
     url: ingress.kspray7.mbp
 
+  openldap:
+    replicaCount: 1
+
   topolvm:
     onControlPlane: true
     controller:

@@ -12,6 +12,9 @@ context:
   ingress:
     url: ingress.kind.local
 
+  openldap:
+    replicaCount: 1
+
   skas:
     skusers:
       bindingByName:

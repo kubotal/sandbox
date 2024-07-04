@@ -53,7 +53,7 @@ deployments:
     component: openldap
     namespace: openldap
     vars:
-      replicaCount: 1 # Should be in context
+
       ldapDomain:  "odp.com"
       adminUser: admin
       adminPassword: admin123
