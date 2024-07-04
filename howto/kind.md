@@ -42,7 +42,7 @@ apiVersion: kind.x-k8s.io/v1alpha4
 name: kind
 networking:
   apiServerAddress: "127.0.0.1"
-  apiServerPort: 5443
+  apiServerPort: 7443
 EOF
 
 kind create cluster --config /tmp/kind-config.yaml

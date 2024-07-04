@@ -7,7 +7,7 @@ context:
     domain: kind.local
 
   apiServer:
-    portOnLocalhost: 5443    # <== To configure
+    portOnLocalhost: 7443    # <== To configure
 
   ingress:
     url: ingress.kind.local

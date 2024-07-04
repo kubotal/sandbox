@@ -38,7 +38,7 @@ deployments:
     component: skas
     namespace: skas-system
     vars:
-      ldap: openldap
+      ldap:
       padl:
         enabled: true
         external: true
@@ -49,7 +49,7 @@ deployments:
         module: main
 
   - name: openldap
-    enabled: true
+    enabled: false
     component: openldap
     namespace: openldap
     vars:
