@@ -14,6 +14,11 @@ components:
     createNamespace: true
     vars:
       ldap: # May be empty
+      padl:
+        enabled: false
+        ssl: true
+        external: false    # If true, padl.xxxx.xxxx must be defined
+        bindPassword: mysecret
     modules:
       - name: skusers
         source: skas
@@ -65,20 +70,24 @@ components:
               tag: 0.2.2-snapshot
               pullPolicy: Always
           skPadl:
-            enabled: true
+            enabled: {{ .Vars.padl.enabled }}
+            {{- if .Vars.padl.enabled }}
             log:
               mode: dev
               level: trace
             ldap:
-              bindPassword: mysecret
+              bindPassword: {{ .Vars.padl.bindPassword }}
             exposure:
-              ssl: true
+              ssl: {{ .Vars.padl.ssl }}
               loadBalancer:
-                enabled: true
+                enabled: {{ .Vars.padl.external }}
+                {{- if .Vars.padl.external }}
                 {{ $padl := printf "padl.%s" .Context.cluster.domain }}
                 ip: {{ resolveDNS $padl }}
                 hosts:
                   - {{ $padl }}
+                {{- end }}
+            {{- end }}
           {{- if .Vars.ldap }}
           skLdap:
             enabled: true

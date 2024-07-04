@@ -39,6 +39,9 @@ deployments:
     namespace: skas-system
     vars:
       ldap: openldap
+      padl:
+        enabled: true
+        external: true
     dependsOn:
       - deployment: ingress-nginx
         module: main
@@ -55,7 +58,6 @@ deployments:
       adminPassword: admin123
       configUser: "admin"
       configPassword: admin123
-
 
   - name: minio1
     parent: minio-small-1
