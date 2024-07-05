@@ -11,6 +11,9 @@ components:
         drivesPerNode: 1
         pools: 1
       ingressName: TBD
+      ingressUnsec:
+        enabled: false
+        host: # TBD if enabled
     modules:
       - name: main
         config:
@@ -52,6 +55,11 @@ components:
               enabled: {{ ne .Context.certificateIssuer.public .Context.certificateIssuer.internal }}
               clusterIssuer: {{ .Context.certificateIssuer.public }}
               host: {{ .Vars.ingressName }}-ext.{{ .Context.ingress.url }}
+            {{- if .Vars.ingressUnsec.enabled }}
+            ingressUnsec:
+              enabled: true
+              host: {{ .Vars.ingressName }}-unsec.{{ .Context.ingress.url }}
+            {{- end }}
             {{- if and .Vars.topology .Context.minio }}
             {{- if .Context.minio.topologies }}
             {{- $topology := get .Context.minio.topologies .Vars.topology }}

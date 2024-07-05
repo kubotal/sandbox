@@ -64,6 +64,8 @@ deployments:
     namespace: minio1
     vars:
       ingressName: minio1
+      ingressUnsec:
+        enabled: true
     enabled: true
     dependsOn:
       - deployment: ingress-nginx
