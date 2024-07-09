@@ -86,8 +86,10 @@ components:
             {{- end }}
             {{- end }}
             {{- if .Vars.ldap }}
-            {{- toYaml (get .Context.minio.ldapSettings  .Vars.ldap) | nindent 10 }}
+            {{- toYaml (get .Context.minio.ldapSettings  "skas") | nindent 2}}
             {{- end }}
+          
+          
             users: []
           
           

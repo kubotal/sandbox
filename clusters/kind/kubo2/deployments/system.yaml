@@ -78,7 +78,7 @@ deployments:
       ingressName: minio2
       ingressUnsec:
         enabled: true
-      ldap: padl
+      ldap: skas
     enabled: true
     dependsOn:
       - deployment: ingress-nginx
