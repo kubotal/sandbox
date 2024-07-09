@@ -113,7 +113,7 @@ context:
           MINIO_IDENTITY_LDAP_USER_DN_SEARCH_FILTER: "(uid=%s)"
           MINIO_IDENTITY_LDAP_GROUP_SEARCH_BASE_DN: "ou=groups,dc=skasproject,dc=com"
           MINIO_IDENTITY_LDAP_GROUP_SEARCH_FILTER: "(&(objectclass=groupOfUniqueNames)(member=%d))"
-          MINIO_IDENTITY_LDAP_TLS_SKIP_VERIFY: "off"
+          MINIO_IDENTITY_LDAP_TLS_SKIP_VERIFY: "on"
           MINIO_IDENTITY_LDAP_SERVER_INSECURE: "off"
           MINIO_IDENTITY_LDAP_SERVER_STARTTLS: "off"
           MINIO_IDENTITY_LDAP_SRV_RECORD_NAME: ""
