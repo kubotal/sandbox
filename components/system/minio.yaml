@@ -14,6 +14,7 @@ components:
       ingressUnsec:
         enabled: false
         host: # TBD if enabled
+      ldap:
     modules:
       - name: main
         config:

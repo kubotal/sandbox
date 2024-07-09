@@ -106,7 +106,7 @@ context:
     ldapSettings:
       skas:
         environment:
-          MINIO_IDENTITY_LDAP_SERVER_ADDR: skas-padl.skas-system.svc:636
+          MINIO_IDENTITY_LDAP_SERVER_ADDR: skas-main-padl.skas-system.svc:636
           MINIO_IDENTITY_LDAP_LOOKUP_BIND_DN: "cn=readonly,dc=system,dc=skasproject,dc=com"
           MINIO_IDENTITY_LDAP_LOOKUP_BIND_PASSWORD: "mysecret"
           MINIO_IDENTITY_LDAP_USER_DN_SEARCH_BASE_DN: "ou=users,dc=skasproject,dc=com"

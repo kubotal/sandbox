@@ -70,3 +70,16 @@ deployments:
     dependsOn:
       - deployment: ingress-nginx
         module: main
+
+  - name: minio2
+    parent: minio-small-1
+    namespace: minio2
+    vars:
+      ingressName: minio2
+      ingressUnsec:
+        enabled: true
+      ldap: padl
+    enabled: true
+    dependsOn:
+      - deployment: ingress-nginx
+        module: main
