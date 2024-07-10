@@ -86,7 +86,7 @@ components:
             {{- end }}
             {{- end }}
             {{- if .Vars.ldap }}
-            {{- toYaml (get .Context.minio.ldapSettings  "skas") | nindent 2 }}
+            {{- toYaml (get .Context.minio.ldapSettings  .Vars.ldap ) | nindent 2 }}
             {{- end }}
           
           
