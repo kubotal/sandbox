@@ -76,6 +76,71 @@ kubectl sk init https://skas.ingress.kubo2.mbp --force
 ```
 
 
+## minio1
+
+```
+mc alias set minio1 https://minio1-ext.ingress.kubo2.mbp minio minio123
+
+mc alias ls
+
+mc ls minio1
+mc mb minio1/yyy
+mc ls minio1
+mc rb minio1/yyy
+```
+
+Add Ldap config:
+
+```
+mc idp ldap add minio1/ \
+      server_addr=skas-main-padl.skas-system.svc:636 \
+      tls_skip_verify=on \
+      lookup_bind_dn=cn=readonly,dc=system,dc=skasproject,dc=com \
+      lookup_bind_password=mysecret \
+      user_dn_search_base_dn=ou=users,dc=skasproject,dc=com \
+      user_dn_search_filter="(uid=%s)" \
+      group_search_base_dn=ou=groups,dc=skasproject,dc=com \
+      group_search_filter="(&(objectclass=groupOfUniqueNames)(member=%d))" \
+&& mc admin service restart minio1
+```
+
+
+To bind a policy (consoleAdmin) to a group:
+
+```
+k sk user bind sa minio1-admin
+
+mc idp ldap policy attach minio1 consoleAdmin --group='cn=minio1-admin,ou=groups,dc=skasproject,dc=com'
+```
+
+
+## minio2
+
+```
+mc alias set minio2 https://minio2-ext.ingress.kubo2.mbp minio minio123
+
+mc alias ls
+
+mc ls minio2
+mc mb minio2/xxx
+mc ls minio2
+mc rb minio2/xxx
+
+
+
+```
+
+
+```
+
+k sk user bind sa minio2-admin
+
+mc idp ldap policy attach minio2 consoleAdmin --group='cn=minio2-admin,ou=groups,dc=skasproject,dc=com'
+
+mc idp ldap policy attach minio2 consoleAdmin --user='uid=sa,ou=users,dc=skasproject,dc=com'
+
+```
+
 
 
 cleanup
@@ -86,5 +151,7 @@ docker container prune --force
 docker volume prune --all --force
 docker network prune --force
 docker image prune --all --force
+
+
 
 ```
