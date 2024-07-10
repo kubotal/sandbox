@@ -60,18 +60,19 @@ deployments:
       configPassword: admin123
 
   - name: minio1
+    enabled: false
     parent: minio-small-1
     namespace: minio1
     vars:
       ingressName: minio1
       ingressUnsec:
         enabled: true
-    enabled: true
     dependsOn:
       - deployment: ingress-nginx
         module: main
 
   - name: minio2
+    enabled: false
     parent: minio-small-1
     namespace: minio2
     vars:
@@ -79,7 +80,6 @@ deployments:
       ingressUnsec:
         enabled: true
       ldap: skas
-    enabled: true
     dependsOn:
       - deployment: ingress-nginx
         module: main
