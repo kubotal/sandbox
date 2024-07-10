@@ -60,7 +60,7 @@ deployments:
       configPassword: admin123
 
   - name: minio1
-    enabled: false
+    enabled: true
     parent: minio-small-1
     namespace: minio1
     vars:
@@ -72,7 +72,7 @@ deployments:
         module: main
 
   - name: minio2
-    enabled: false
+    enabled: true
     parent: minio-small-1
     namespace: minio2
     vars:
