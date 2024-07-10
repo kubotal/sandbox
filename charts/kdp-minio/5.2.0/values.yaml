@@ -5,13 +5,13 @@ kyverno:
 minio:
 
   image:
-#    repository: quay.io/minio/minio
-#    tag: RELEASE.2024-04-18T19-09-19Z
-#    pullPolicy: IfNotPresent
+    repository: quay.io/minio/minio
+    tag: RELEASE.2024-04-18T19-09-19Z
+    pullPolicy: IfNotPresent
 
-    repository: ghcr.io/kubedp/minio-odp
-    tag: RELEASE.2023-09-30T07-02-29Z
-    pullPolicy: Always
+#    repository: ghcr.io/kubedp/minio-odp
+#    tag: RELEASE.2023-09-30T07-02-29Z
+#    pullPolicy: Always
 
   rootUser: # TBD
   rootPassword: # TBD

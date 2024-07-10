@@ -105,12 +105,51 @@ mc idp ldap add minio1/ \
 ```
 
 
+```
+mc idp ldap add minio1/ \
+      server_addr=skas-main-padl.skas-system.svc:636 \
+      lookup_bind_dn=cn=readonly,dc=system,dc=skasproject,dc=com \
+      lookup_bind_password=mysecret \
+      user_dn_search_base_dn=ou=users,dc=skasproject,dc=com \
+      user_dn_search_filter="(uid=%s)" \
+      group_search_base_dn=ou=groups,dc=skasproject,dc=com \
+      group_search_filter="(&(objectclass=groupOfUniqueNames)(member=%d))" \
+&& mc admin service restart minio1
+```
+
+
 To bind a policy (consoleAdmin) to a group:
 
 ```
 k sk user bind sa minio1-admin
 
 mc idp ldap policy attach minio1 consoleAdmin --group='cn=minio1-admin,ou=groups,dc=skasproject,dc=com'
+```
+
+
+```
+mc idp ldap rm minio1 && mc admin service restart minio1
+
+```
+
+```
+mc idp ldap add minio1/ \
+      server_addr=openldap-main.openldap.svc:636 \
+      tls_skip_verify=on \
+      lookup_bind_dn=cn=admin,dc=odp,dc=com \
+      lookup_bind_password=admin123 \
+      user_dn_search_base_dn=ou=Users,dc=odp,dc=com \
+      user_dn_search_filter="(uid=%s)" \
+      group_search_base_dn=ou=Groups,dc=odp,dc=com \
+      group_search_filter="(&(objectclass=posixGroup)(memberUid=%s))" \
+&& mc admin service restart minio1
+
+
+mc idp ldap policy attach minio1 consoleAdmin --group='cn=ops,ou=Groups,dc=odp,dc=com'
+
+mc idp ldap policy attach minio1 consoleAdmin --user='uid=sergea,ou=Users,dc=odp,dc=com'
+
+
 ```
 
 
@@ -141,6 +180,10 @@ mc idp ldap policy attach minio2 consoleAdmin --user='uid=sa,ou=users,dc=skaspro
 
 ```
 
+```
+LDAPTLS_REQCERT=never ldapsearch -LLL -H ldaps://padl.kubo2.mbp -D "cn=readonly,dc=system,dc=skasproject,dc=com" -w mysecret -x -bou=users,dc=skasproject,dc=com uid=jclark
+
+```
 
 
 cleanup
