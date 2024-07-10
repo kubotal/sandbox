@@ -105,19 +105,6 @@ mc idp ldap add minio1/ \
 ```
 
 
-```
-mc idp ldap add minio1/ \
-      server_addr=skas-main-padl.skas-system.svc:636 \
-      lookup_bind_dn=cn=readonly,dc=system,dc=skasproject,dc=com \
-      lookup_bind_password=mysecret \
-      user_dn_search_base_dn=ou=users,dc=skasproject,dc=com \
-      user_dn_search_filter="(uid=%s)" \
-      group_search_base_dn=ou=groups,dc=skasproject,dc=com \
-      group_search_filter="(&(objectclass=groupOfUniqueNames)(member=%d))" \
-&& mc admin service restart minio1
-```
-
-
 To bind a policy (consoleAdmin) to a group:
 
 ```
