@@ -151,6 +151,7 @@ context:
         bindPassword: mysecret
         secretNsCa: cert-manager/cluster-issuer1-ca # TBD i.e: cert-manager/cluster-issuer-ca
 
+  # To generate passwords: 'slappasswd -s myPassword' on an ldap node
   openldap:
     customLdifFiles:
       00-root.ldif: |-
