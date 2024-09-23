@@ -13,7 +13,7 @@ deployments:
         enabled: true
 
   - name: metallb
-    component: metallbx
+    component: metallb
     namespace: metallb
 
   - name: ingress-nginx
