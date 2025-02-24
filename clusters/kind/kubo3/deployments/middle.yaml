@@ -1,0 +1,6 @@
+deployments:
+
+  - name: cnpg
+    component: cnpg:v0.21.2
+    namespace: cnpg
+

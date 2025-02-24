@@ -9,7 +9,7 @@ sources:
 
 components:
 
-  - name: cnpg
+  - name: cnpg:v0.21.2
     createNamespace: true
     modules:
       - name: main
